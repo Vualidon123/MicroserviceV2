@@ -6,7 +6,7 @@ public class Repository<T> : IRepository<T> where T : class
 {
     private readonly IMongoCollection<T> _collection;
 
-    public Repository(ApplicationDbContext context)
+    public Repository(MongoDbContext context)
     {
         _collection = context.GetCollection<T>();
     }

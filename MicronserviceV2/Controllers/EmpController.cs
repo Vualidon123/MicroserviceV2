@@ -10,10 +10,10 @@ namespace MicronserviceV2.Controllers
     [ApiController]
     public class EmpController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly MongoDbContext _context;
         private readonly Repository<Emp> _empRepository;
 
-        public EmpController(ApplicationDbContext context)
+        public EmpController(MongoDbContext context)
         {
             _context = context;
             _empRepository = new Repository<Emp>(_context);

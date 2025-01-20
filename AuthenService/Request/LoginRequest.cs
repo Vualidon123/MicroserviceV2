@@ -1,6 +1,6 @@
 ﻿namespace AuthenService.Request
 {
-    public class EmpRequest
+    public class LoginReq
     {
     public string Email { get; set; }
     public string PassWord { get;set; }

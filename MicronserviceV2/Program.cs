@@ -10,11 +10,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Register ApplicationDbContext as a singleton
-builder.Services.AddSingleton<ApplicationDbContext>(sp =>
+builder.Services.AddSingleton<MongoDbContext>(sp =>
 {
     string connectionString = "mongodb://localhost:27017";
     string databaseName = "NewDatabaseName"; // Change this to your new database name
-    return new ApplicationDbContext(connectionString, databaseName);
+    return new MongoDbContext(connectionString, databaseName);
 });
 
 var app = builder.Build();
@@ -37,9 +37,8 @@ string connectionString = "mongodb://localhost:27017";
 string databaseName = "NewDatabaseName"; // Change this to your new database name
 
 // Create an instance of the ApplicationDbContext
-var dbContext = new ApplicationDbContext(connectionString, databaseName);
-
+var dbContext = new MongoDbContext(connectionString, databaseName);
 // Optionally, seed the database with initial data
-
+dbContext.SeedData();
 
 app.Run();
