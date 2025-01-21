@@ -1,15 +1,18 @@
-﻿using JWT_Authen.Data;
-using MongoDB.Bson;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using System.Linq.Expressions;
 
-public class Repository<T> : IRepository<T> where T : class
+public class Repository<T> : RabitIRepository<T> where T : class
 {
     private readonly IMongoCollection<T> _collection;
+    private readonly MongoDbContext _context;
 
-    public Repository(MongoDbContext context) => _collection = context.GetCollection<T>();
+    public Repository(MongoDbContext context)
+    {
+        _context = context;
+        _collection = context.GetCollection<T>();
+    }
 
-    public async Task<T?> GetByIdAsync(ObjectId id)
+    public async Task<T?> GetByIdAsync(int id)
     {
         var filter = Builders<T>.Filter.Eq("ID", id);
         return await _collection.Find(filter).FirstOrDefaultAsync();
@@ -27,6 +30,12 @@ public class Repository<T> : IRepository<T> where T : class
 
     public async Task AddAsync(T entity)
     {
+        var idProperty = typeof(T).GetProperty("ID");
+        if (idProperty != null && idProperty.PropertyType == typeof(int))
+        {
+            var newId = _context.GetNextSequenceValue(typeof(T).Name);
+            idProperty.SetValue(entity, newId);
+        }
         await _collection.InsertOneAsync(entity);
     }
 

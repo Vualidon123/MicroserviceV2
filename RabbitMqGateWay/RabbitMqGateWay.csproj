@@ -11,6 +11,9 @@
     <PackageReference Include="RabbitMQ.Client" Version="7.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     <PackageReference Include="System.Net.Mail.Abstractions" Version="1.1.21" />
+	<PackageReference Include="MongoDB.Bson" Version="3.1.0" />
+	<PackageReference Include="MongoDB.Driver" Version="3.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />	  
   </ItemGroup>
 
 </Project>

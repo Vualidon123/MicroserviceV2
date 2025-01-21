@@ -1,8 +1,8 @@
-﻿using JWT_Authen.Data;
+﻿
 using MongoDB.Driver;
 using System.Linq.Expressions;
 
-public interface IRepository<T> where T : class
+public interface RabitIRepository<T> where T : class
 {
     Task<T?> GetByIdAsync(int id);
     Task<IEnumerable<T>> GetAllAsync();

@@ -18,6 +18,7 @@ namespace JWT_Authen.Data
         public IMongoCollection<Func> Permissions => _database.GetCollection<Func>("Permissions");
         public IMongoCollection<EmpRole> UserRoles => _database.GetCollection<EmpRole>("UserRoles");
         public IMongoCollection<RoleFunc> RolePermissions => _database.GetCollection<RoleFunc>("RolePermissions");
+
         public IMongoCollection<T> GetCollection<T>()
         {
             if (typeof(T) == typeof(Emp))
