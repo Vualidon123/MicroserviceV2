@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenService", "AuthenServ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMqGateWay", "RabbitMqGateWay\RabbitMqGateWay.csproj", "{4CC7E83B-0107-4E4D-8CB0-C2172094EAEC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{01ACC071-EC7C-4022-9724-3189E75902F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Start", "Start\Start.csproj", "{36FE63A8-CE88-4F03-A677-6C584B69A381}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{4CC7E83B-0107-4E4D-8CB0-C2172094EAEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CC7E83B-0107-4E4D-8CB0-C2172094EAEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CC7E83B-0107-4E4D-8CB0-C2172094EAEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01ACC071-EC7C-4022-9724-3189E75902F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01ACC071-EC7C-4022-9724-3189E75902F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01ACC071-EC7C-4022-9724-3189E75902F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01ACC071-EC7C-4022-9724-3189E75902F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36FE63A8-CE88-4F03-A677-6C584B69A381}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36FE63A8-CE88-4F03-A677-6C584B69A381}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36FE63A8-CE88-4F03-A677-6C584B69A381}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36FE63A8-CE88-4F03-A677-6C584B69A381}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

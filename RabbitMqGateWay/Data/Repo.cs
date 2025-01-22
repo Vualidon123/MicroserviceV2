@@ -34,7 +34,7 @@ public class Repository<T> : RabitIRepository<T> where T : class
         if (idProperty != null && idProperty.PropertyType == typeof(int))
         {
             var newId = _context.GetNextSequenceValue(typeof(T).Name);
-            idProperty.SetValue(entity, newId);
+            idProperty.SetValue(entity,newId);
         }
         await _collection.InsertOneAsync(entity);
     }

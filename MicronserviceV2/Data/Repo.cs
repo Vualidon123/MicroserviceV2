@@ -9,7 +9,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public Repository(MongoDbContext context) => _collection = context.GetCollection<T>();
 
-    public async Task<T?> GetByIdAsync(ObjectId id)
+    public async Task<T?> GetByIdAsync(int id)
     {
         var filter = Builders<T>.Filter.Eq("ID", id);
         return await _collection.Find(filter).FirstOrDefaultAsync();
