@@ -1,6 +1,7 @@
 using Application.Proxy;
 using AuthenService.Serivce;
 using AuthenService.Service;
+using EmpService.Consumer;
 using JWT_Authen.Proxy.Web.cs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IHttpEmpProxy,HttpEmpProxy>();
 builder.Services.AddSingleton<IHttpAuthenProxy, HttpAuthenProxy>();
 builder.Services.AddSingleton<IHttpRabbitMqProxy, HttpRabbitMqProxy>();
+builder.Services.AddSingleton<IRabbitMqConsumer,RabbitMqConsumer>();
 builder.Services.AddSingleton<TokenService>();
 builder.Services.AddSingleton(sp =>
 {

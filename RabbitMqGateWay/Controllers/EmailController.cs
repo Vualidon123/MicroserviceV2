@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using EmpService.Consumer;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace RabbitMqGateWay.Controllers
@@ -8,11 +9,14 @@ namespace RabbitMqGateWay.Controllers
     public class EmailController : ControllerBase
     {
         private readonly RabbitMqProducerService _rabbitMqProducerService;
+        private readonly IRabbitMqConsumer _rabbitMqConsumer;
         private readonly RabitIRepository<Email> _emailRepository;
         private readonly RabitIRepository<Notification> _notifyRepository;
-        public EmailController(RabbitMqProducerService rabbitMqProducerService, RabitIRepository<Email> emailRepository, RabitIRepository<Notification> notifyRepository)
+
+        public EmailController(RabbitMqProducerService rabbitMqProducerService, IRabbitMqConsumer rabbitMqConsumer, RabitIRepository<Email> emailRepository, RabitIRepository<Notification> notifyRepository)
         {
             _rabbitMqProducerService = rabbitMqProducerService;
+            _rabbitMqConsumer = rabbitMqConsumer;
             _emailRepository = emailRepository;
             _notifyRepository = notifyRepository;
         }
@@ -25,18 +29,21 @@ namespace RabbitMqGateWay.Controllers
                 return BadRequest("Invalid email request.");
             }
 
-            var message = $"To: {emailRequest.To}, Subject: {emailRequest.Title}, Body: {emailRequest.Body}";
-            var email = new Email
+            await _rabbitMqProducerService.SendMessageAsync(emailRequest);
+
+            if (!await _rabbitMqConsumer.ConsumeMessageAsync())
             {
-                SentDate = DateTime.UtcNow,
+                return BadRequest("Email message sent to RabbitMQ, but there was an error consuming the message.");
+            }
+            var email = new Email   
+            {
+                SentDate = DateTime.UtcNow.AddHours(7),
                 Subject = emailRequest.Title,
                 Body = emailRequest.Body,
                 emailrecive = emailRequest.To,
             };
             await _emailRepository.AddAsync(email);
             await _emailRepository.SaveChangesAsync();
-            await _rabbitMqProducerService.SendMessageAsync(message);
-
             return Ok("Email message sent to RabbitMQ.");
         }
 
@@ -45,27 +52,24 @@ namespace RabbitMqGateWay.Controllers
         {
             if (notificationRequest == null || string.IsNullOrEmpty(notificationRequest.To) || string.IsNullOrEmpty(notificationRequest.Title) || string.IsNullOrEmpty(notificationRequest.Body))
             {
-                return BadRequest("Invalid email request.");
+                return BadRequest("Invalid notification request.");
             }
-            var message = $"Title: {notificationRequest.Title}, Message: {notificationRequest.Title}";
+
+            await _rabbitMqProducerService.SendNotify(notificationRequest);
+
+            if (!await _rabbitMqConsumer.ConsumeMessageAsync())
+            {
+                return BadRequest("Email message sent to RabbitMQ, but there was an error consuming the message.");
+            }
             var noti = new Notification
             {
-                CreatedDate = DateTime.UtcNow,
+                CreatedDate = DateTime.UtcNow.AddHours(7),
                 Message = notificationRequest.Body,
                 emailrecive = notificationRequest.To,
                 Title = notificationRequest.Title
             };
             await _notifyRepository.AddAsync(noti);
             await _notifyRepository.SaveChangesAsync();
-            await _rabbitMqProducerService.SendNotify(message);
-            return Ok("Notification message sent to RabbitMQ.");
-        }
-        [HttpGet]
-        public async Task<IActionResult> ConsumeEmail()
-        {
-          
-            await _rabbitMqProducerService.ConsumeMessageAsync();
-
             return Ok("Notification message sent to RabbitMQ.");
         }
     }

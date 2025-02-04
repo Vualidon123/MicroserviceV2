@@ -28,7 +28,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+app.UseAuthorization(); 
 
 app.MapControllers();
 
@@ -39,6 +39,6 @@ string databaseName = "NewDatabaseName"; // Change this to your new database nam
 // Create an instance of the ApplicationDbContext
 var dbContext = new MongoDbContext(connectionString, databaseName);
 // Optionally, seed the database with initial data
-/*dbContext.SeedData();*/
+dbContext.SeedData();
 
 app.Run();

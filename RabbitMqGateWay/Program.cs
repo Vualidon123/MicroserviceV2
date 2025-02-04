@@ -1,3 +1,5 @@
+using EmpService.Consumer;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -11,11 +13,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<MongoDbContext>(sp =>
 {
     string connectionString = "mongodb://localhost:27017";
-    string databaseName = "RabbitMQDb"; // Change this to your new database name
+    string databaseName = "RabbitMQDb"; // Change this to your new database naa ame
     return new MongoDbContext(connectionString, databaseName);
 });
 builder.Services.AddSingleton<RabitIRepository<Email>, Repository<Email>>();
 builder.Services.AddSingleton<RabitIRepository<Notification>, Repository<Notification>>();
+builder.Services.AddSingleton<IRabbitMqConsumer, RabbitMqConsumer>();
 var app = builder.Build();
 string connectionString = "mongodb://localhost:27017";
 string databaseName = "RabbitMQDb"; // Change this to your new database name

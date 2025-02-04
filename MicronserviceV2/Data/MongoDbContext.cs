@@ -1,4 +1,5 @@
 
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace JWT_Authen.Data
@@ -39,10 +40,14 @@ namespace JWT_Authen.Data
             // Seed Emp data
             if (!Emps.Find(_ => true).Any())
             {
+                var johnId = ObjectId.GenerateNewId();
+                var janeId = ObjectId.GenerateNewId();
+                var bobId = ObjectId.GenerateNewId();
                 Emps.InsertMany(new[]
                 {
             new Emp
             {
+                ObjectId= johnId,
                 ID = 1,
                 Name = "John Doe",
                 EmailAddress = "john@example.com",
@@ -50,7 +55,8 @@ namespace JWT_Authen.Data
                 Password = "hashed_password_1" // In production, ensure passwords are properly hashed
             },
             new Emp
-            {
+            {   
+                ObjectId= janeId,
                 ID = 2,
                 Name = "Jane Smith",
                 EmailAddress = "jane@example.com",
@@ -58,7 +64,8 @@ namespace JWT_Authen.Data
                 Password = "hashed_password_2"
             },
             new Emp
-            {
+            {   
+                ObjectId= bobId,
                 ID = 3,
                 Name = "Bob Wilson",
                 EmailAddress = "bob@example.com",

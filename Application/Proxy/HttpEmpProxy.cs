@@ -20,7 +20,7 @@ namespace JWT_Authen.Proxy.Web.cs
         {
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri("http://localhost:5211/");
-            _httpClient.Timeout = TimeSpan.FromSeconds(30);
+            _httpClient.Timeout = TimeSpan.FromSeconds(630);
 
         }
 

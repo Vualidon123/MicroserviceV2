@@ -22,7 +22,7 @@ namespace Application.Proxy
         {
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri("http://localhost:5210/");
-            _httpClient.Timeout = TimeSpan.FromSeconds(30);
+            _httpClient.Timeout = TimeSpan.FromSeconds(630);
         }
         public async Task<(HttpStatusCode statusCode, string content)> AuthLogin(LoginReq loginDto)
         {

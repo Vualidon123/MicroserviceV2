@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 public class Email
 {
     [BsonId]
-    public int ID { get; set; }
+    public int _ID { get; set; }
     public int EmpId { get; set; }
     public string Subject { get; set; }
     public string emailrecive { get; set; }

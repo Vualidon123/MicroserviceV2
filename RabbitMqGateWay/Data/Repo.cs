@@ -1,6 +1,17 @@
 ﻿using MongoDB.Driver;
 using System.Linq.Expressions;
 
+
+public interface RabitIRepository<T> where T : class
+{
+    Task<T?> GetByIdAsync(int id);
+    Task<IEnumerable<T>> GetAllAsync();
+    Task<T?> FindAsync(Expression<Func<T, bool>> predicate);
+    Task AddAsync(T entity);
+    Task UpdateAsync(T entity);
+    Task DeleteAsync(T entity);
+    Task SaveChangesAsync();
+}
 public class Repository<T> : RabitIRepository<T> where T : class
 {
     private readonly IMongoCollection<T> _collection;
@@ -30,11 +41,11 @@ public class Repository<T> : RabitIRepository<T> where T : class
 
     public async Task AddAsync(T entity)
     {
-        var idProperty = typeof(T).GetProperty("ID");
+        var idProperty = typeof(T).GetProperty("ID") ?? typeof(T).GetProperty("_ID");
         if (idProperty != null && idProperty.PropertyType == typeof(int))
         {
             var newId = _context.GetNextSequenceValue(typeof(T).Name);
-            idProperty.SetValue(entity,newId);
+            idProperty.SetValue(entity, newId);  
         }
         await _collection.InsertOneAsync(entity);
     }

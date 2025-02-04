@@ -1,9 +1,11 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.Collections.Generic;
 
 public class Emp
 {
     [BsonId]
+    public ObjectId ObjectId { get; set; }
     public int ID { get; set; }
     public string PhoneNumber { get; set; }
     public string EmailAddress { get; set; }
