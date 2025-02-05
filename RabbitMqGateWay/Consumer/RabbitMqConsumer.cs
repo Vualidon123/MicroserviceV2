@@ -26,81 +26,60 @@ namespace EmpService.Consumer
             var factory = new ConnectionFactory() { HostName = _hostName };
             var check = true;
 
-            try
-            {
+          
                 using (var connection = await factory.CreateConnectionAsync())
                 using (var channel = await connection.CreateChannelAsync())
                 {
                     // Declare the queue
-                    await channel.QueueDeclareAsync(queue: _queueName,
-                                                    durable: false,
-                                                    exclusive: false,
-                                                    autoDelete: false,
-                                                    arguments: null);
-
+                    await channel.QueueDeclareAsync(queue: _queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
                     var consumer = new AsyncEventingBasicConsumer(channel);
-
                     consumer.ReceivedAsync += async (model, ea) =>
                     {
                         var body = ea.Body.ToArray();
                         var message = Encoding.UTF8.GetString(body);
-
-                        if (string.IsNullOrWhiteSpace(message))
-                        {
-                            Console.WriteLine("Received an empty message.");
-                            check = false;
-                            return;
-                        }
-
+                        int retryCount = ea.BasicProperties.Headers != null && ea.BasicProperties.Headers.ContainsKey("retryCount") ?   (int)ea.BasicProperties.Headers["retryCount"] : 0;
                         // Validate JSON format and deserialize
                         Request? emailRequest = null;
-                        try
-                        {
-                            emailRequest = JsonSerializer.Deserialize<Request>(message);
-                        }
-                        catch (JsonException jsonEx)
-                        {
-                            Console.WriteLine($"JSON Exception: {jsonEx.Message}");
-                            check = false;
-                            return;
-                        }
-
+                        emailRequest = JsonSerializer.Deserialize<Request>(message);
+                      
                         if (emailRequest != null)
                         {
                             try
-                            {
+                            {                              
                                 await SendEmailAsync(emailRequest);
                             }
                             catch (Exception ex)
                             {
                                 Console.WriteLine($"Error sending email: {ex.Message}");
                                 check = false;
+                                if (retryCount<3)
+                                {
+                                    retryCount++;
+                                    var properties = new BasicProperties();
+                                    properties.Persistent = true;
+                                    properties.Headers = new Dictionary<string, object> { { "retryCount", retryCount } };
+                                    await channel.BasicPublishAsync(exchange: "", routingKey: _queueName, mandatory: false, basicProperties: properties, body: body);                     
+                                    Console.WriteLine($"Message requeued with retryCount: {retryCount}");
+                                }
+                                else
+                                {   
+                                    Console.WriteLine($"❌ Đưa vào DLQ: {message}");                                                             
+                                }
                             }
                         }
-                        else
-                        {
-                            Console.WriteLine("Failed to deserialize email request: Message might be improperly formatted.");
-                            check = false;
-                        }
+                        /*else 
+                        if (retryCount>3)
+                    {
+                        Console.WriteLine($"❌ Đưa vào DLQ: {message}");
+                        channel.BasicNackAsync(ea.DeliveryTag, false, false); // Gửi vào Dead Letter Queue (không requeue)
+                    }*/
                     };
-
-                    await channel.BasicConsumeAsync(queue: _queueName,
-                                                    autoAck: true,
-                                                    consumer: consumer);
-
-                    // Wait for the consumer to process messages
-                    await Task.Delay(1000); // Adjust the delay as needed
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error consuming message: {ex.Message}");
-                check = false;
-            }
-
+                await channel.BasicConsumeAsync(queue: _queueName, autoAck: true, consumer: consumer);
+                // Wait for the consumer to process messages
+                await Task.Delay(1000); // Adjust the delay as needed
+                }           
             return check;
         }
-
         public async Task SendEmailAsync(Request email)
         {
             var fromEmail = "lacduy5@gmail.com";

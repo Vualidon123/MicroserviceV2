@@ -28,7 +28,6 @@ namespace RabbitMqGateWay.Controllers
             {
                 return BadRequest("Invalid email request.");
             }
-
             await _rabbitMqProducerService.SendMessageAsync(emailRequest);
 
             if (!await _rabbitMqConsumer.ConsumeMessageAsync())

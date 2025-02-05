@@ -35,11 +35,7 @@ public class RabbitMqProducerService
 
                 // Create basic properties and add retryCount header
                 var properties = new BasicProperties();
-                properties.Headers = new Dictionary<string, object>
-                {
-                    { "retryCount",0}
-                };
-
+                properties.Headers = new Dictionary<string, object> {{ "retryCount",0}};
                 // Publish the message
                 await channel.BasicPublishAsync(exchange: "",
                                                 routingKey: _queueName,
