@@ -37,7 +37,7 @@ namespace EmpService.Consumer
                     {
                         var body = ea.Body.ToArray();
                         var message = Encoding.UTF8.GetString(body);
-                        int retryCount = ea.BasicProperties.Headers != null && ea.BasicProperties.Headers.ContainsKey("retryCount") ?   (int)ea.BasicProperties.Headers["retryCount"] : 0;
+                        int retryCount = ea.BasicProperties.Headers != null && ea.BasicProperties.Headers.ContainsKey("retryCount") ?(int)ea.BasicProperties.Headers["retryCount"] : 0;
                         // Validate JSON format and deserialize
                         Request? emailRequest = null;
                         emailRequest = JsonSerializer.Deserialize<Request>(message);
@@ -47,32 +47,30 @@ namespace EmpService.Consumer
                             try
                             {                              
                                 await SendEmailAsync(emailRequest);
+                               /* await channel.BasicAckAsync(ea.DeliveryTag, false);*/
+                                Console.WriteLine($"✅ Email gửi thành công: {message}");
                             }
                             catch (Exception ex)
-                            {
-                                Console.WriteLine($"Error sending email: {ex.Message}");
-                                check = false;
-                                if (retryCount<3)
+                            {                           
+                                retryCount++;
+                                if (retryCount>3)
                                 {
-                                    retryCount++;
+                                    Console.WriteLine($"❌ Đưa vào DLQ: {message}");
+                                    check = false;
+                                    await channel.BasicNackAsync(ea.DeliveryTag, false, false); // Gửi vào Dead Letter Queue (không requeue)
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"⚠️ Lỗi gửi email ({retryCount}/{3}): {ex.Message}. Thử lại...");                                
                                     var properties = new BasicProperties();
                                     properties.Persistent = true;
                                     properties.Headers = new Dictionary<string, object> { { "retryCount", retryCount } };
                                     await channel.BasicPublishAsync(exchange: "", routingKey: _queueName, mandatory: false, basicProperties: properties, body: body);                     
-                                    Console.WriteLine($"Message requeued with retryCount: {retryCount}");
+                                    /*await channel.BasicAckAsync(ea.DeliveryTag, false);*/
                                 }
-                                else
-                                {   
-                                    Console.WriteLine($"❌ Đưa vào DLQ: {message}");                                                             
-                                }
+                              
                             }
                         }
-                        /*else 
-                        if (retryCount>3)
-                    {
-                        Console.WriteLine($"❌ Đưa vào DLQ: {message}");
-                        channel.BasicNackAsync(ea.DeliveryTag, false, false); // Gửi vào Dead Letter Queue (không requeue)
-                    }*/
                     };
                 await channel.BasicConsumeAsync(queue: _queueName, autoAck: true, consumer: consumer);
                 // Wait for the consumer to process messages
@@ -92,7 +90,7 @@ namespace EmpService.Consumer
                 EnableSsl = true,
             };
 
-            var mailMessage = new MailMessage
+            var mailMessage = new MailMessage   
             {
                 From = new MailAddress(fromEmail),
                 Subject = email.Title,
