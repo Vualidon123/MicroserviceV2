@@ -32,36 +32,12 @@ namespace ProductService.Controllers
             _publis = publis;
            
         }
-
         [HttpGet]
         public async Task<IEnumerable<Order>> GetOrders()
         {
             var result = await _orderRepository.GetAllAsync();
             return result;
         }
-
-       /* [HttpPut]
-        public async Task<ActionResult<Order>> UpdateOrder(Order order)
-        {
-            if (order == null)
-            {
-                return BadRequest();
-            }
-            await _orderRepository.UpdateAsync(order.ObjectId, order);
-            return order;
-        }*/
-
-        [HttpPost]
-        public async Task<ActionResult<Order>> CreateOrder(Order order)
-        {
-            if (order == null)
-            {
-                return BadRequest();
-            }
-            await _orderRepository.AddAsync(order);
-            return order;
-        }
-
         [HttpPost("place-order")]
         public async Task<ActionResult<Order>> PlaceOrder([FromBody] OrderRequest orderRequest)
         {                      

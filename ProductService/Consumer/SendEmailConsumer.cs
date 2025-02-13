@@ -1,32 +1,37 @@
 ﻿using ProductService.Models;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client;
+using System.Net.Mail;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using ProductService.Datas;
-using System.Net.Mail;
-using System.Net;
 
 namespace ProductService.Services
 {
-    public class OrderConsumer : BackgroundService
+    public interface IEmailConsumer
+    {
+        Task ConsumeMessageAsync();
+        Task SendEmailAsync(OrderRequest request);
+    }    
+    public class EmailConsumer : IEmailConsumer
     {
         private readonly Repository<Product> _productRepository;
-
-        public OrderConsumer(Repository<Product> productRepository)
+        public EmailConsumer(Repository<Product> productService)
         {
-            _productRepository = productRepository;
+            _productRepository = productService;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        public async Task ConsumeMessageAsync()      
         {
-            string _hostName = "localhost";
+            string _hostName = "localhost"; // or the RabbitMQ server address
             string _queueName = "orderProduct";
 
             var factory = new ConnectionFactory() { HostName = _hostName };
             using (var connection = await factory.CreateConnectionAsync())
             using (var channel = await connection.CreateChannelAsync())
             {
+                // Declare the queue
                 await channel.QueueDeclareAsync(queue: _queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
                 var consumer = new AsyncEventingBasicConsumer(channel);
                 consumer.ReceivedAsync += async (model, ea) =>
@@ -34,13 +39,17 @@ namespace ProductService.Services
                     var body = ea.Body.ToArray();
                     var message = Encoding.UTF8.GetString(body);
                     int retryCount = ea.BasicProperties.Headers != null && ea.BasicProperties.Headers.ContainsKey("retryCount") ? (int)ea.BasicProperties.Headers["retryCount"] : 0;
-                    OrderRequest? orderDetails = JsonSerializer.Deserialize<OrderRequest>(message);
+                    // Validate JSON format and deserialize
+                    OrderRequest? orderDetails = null;
+                    orderDetails = JsonSerializer.Deserialize<OrderRequest> (message);
                     if (orderDetails != null)
                     {
                         try
-                        {
+                        {   
+
+                            await channel.BasicAckAsync(ea.DeliveryTag, false);//Xac nhan xu ly thanh cong
                             await SendEmailAsync(orderDetails);
-                            await channel.BasicAckAsync(ea.DeliveryTag, false);
+                            Console.WriteLine($"Dang gui email voi noi dung: {message}");
                         }
                         catch (Exception ex)
                         {
@@ -63,9 +72,9 @@ namespace ProductService.Services
                     }
                 };
                 await channel.BasicConsumeAsync(queue: _queueName, autoAck: false, consumer: consumer);
-                await Task.Delay(1000, stoppingToken);
+                await Task.Delay(1000); // Adjust the delay as needed
             }
-        }
+        }      
 
         public async Task SendEmailAsync(OrderRequest email)
         {
@@ -98,7 +107,6 @@ namespace ProductService.Services
                 throw;
             }
         }
-
         private async Task<string> GenerateEmailBodyAsync(OrderRequest email)
         {
             var sb = new StringBuilder();

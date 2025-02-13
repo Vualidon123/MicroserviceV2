@@ -16,8 +16,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<IHttpEmpProxy,HttpEmpProxy>();
-builder.Services.AddSingleton<IHttpAuthenProxy, HttpAuthenProxy>();
+/*builder.Services.AddSingleton<IHttpEmpProxy,HttpEmpProxy>();
+builder.Services.AddSingleton<IHttpAuthenProxy, HttpAuthenProxy>();*/
 builder.Services.AddSingleton<IHttpRabbitMqProxy, HttpRabbitMqProxy>();
 builder.Services.AddSingleton<IRabbitMqConsumer,RabbitMqConsumer>();
 builder.Services.AddSingleton<TokenService>();

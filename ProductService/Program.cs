@@ -1,4 +1,5 @@
-
+using ProductService.Consumer;
+using ProductService.Consumers;
 using ProductService.Datas;
 using ProductService.Services;
 
@@ -11,9 +12,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<Publis>();
+builder.Services.AddSingleton<IOrderConsumer, OrderConsumer>();
+builder.Services.AddSingleton<IEmailConsumer, EmailConsumer>();
+builder.Services.AddHostedService<CosumeServiceRegister>();
 builder.Services.AddSingleton(typeof(Repository<>));
-builder.Services.AddHostedService< OrderConsumer>();
-builder.Services.AddHostedService<ProductConsumer>();
 builder.Services.AddSingleton<MongoDbContext>(sp =>
 {
     string connectionString = "mongodb://localhost:27017";
