@@ -1,3 +1,4 @@
-# This is PoC which is create for implement Message broker as an microservice for optimzing the speed and logic for e-commerce app especially for sale .
+# This is PoC of an Web API for e-commerce app
+- Using message broker(RabbitMq) to handle logic for sale and send confirm mail for order
 - Core technology : .NET ASP Web API, RabbitMq, MongoDb
-- Please configure the env on appsettings.json file before running the project
+- Please configure the connectionstring on program.cs file before running the project
